@@ -1,0 +1,26 @@
+{
+  "name": "nearyounews",
+  "version": "1.0.0",
+  "description": "A Location Based news service",
+  "homepage": "https://github.com/dev-dvnsh/nearyounews#readme",
+  "bugs": {
+    "url": "https://github.com/dev-dvnsh/nearyounews/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-dvnsh/nearyounews.git"
+  },
+  "license": "ISC",
+  "author": "dev-dvnsh",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.2"
+  }
+}
