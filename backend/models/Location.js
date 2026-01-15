@@ -19,4 +19,4 @@ const locationScheme = new mongoose.Schema(
 // Create model from the schema
 const Location = mongoose.model("Location", locationScheme);
 
-model.exports = Location;
+module.exports = Location;
