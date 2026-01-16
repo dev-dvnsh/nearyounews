@@ -8,13 +8,14 @@ const newsSchema = new mongoose.Schema(
       trim: true,
     },
     location: {
-      latitude: {
-        type: Number,
-        require: true,
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
       },
-      longitude: {
-        type: Number,
-        require: true,
+      coordinates: {
+        type: [Number], // [lat,long]
+        required: true,
       },
     },
   },
@@ -22,6 +23,9 @@ const newsSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+//Geo index for distance/radius queries
+newsSchema.index({ location: "2dsphere" });
 
 // TTL: auto delete news after 7 days
 newsSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 });

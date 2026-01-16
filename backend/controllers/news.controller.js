@@ -2,7 +2,7 @@ const express = require("express");
 const News = require("../models/News");
 const createNews = async (req, res) => {
   try {
-    const { content, location } = req.body;
+    const { content, latitude, longitude } = req.body;
 
     // 1 Basic presence check
     if (!content) {
@@ -12,14 +12,12 @@ const createNews = async (req, res) => {
       });
     }
 
-    if (!location || location.latitude == null || location.longitude == null) {
+    if (latitude == undefined || longitude == undefined) {
       return res.status(400).json({
         success: false,
         message: "Location with latitude and longitude is required",
       });
     }
-
-    const { latitude, longitude } = location;
 
     // 2 Type check
     if (typeof latitude !== "number" || typeof longitude !== "number") {
@@ -44,13 +42,16 @@ const createNews = async (req, res) => {
       });
     }
 
+    // Transform into GeoJSON
+    const location = {
+      type: "Point",
+      coordinate: [longitude, latitude],
+    };
+
     // Save to MongoDB
     const news = new News({
       content,
-      location: {
-        latitude,
-        longitude,
-      },
+      location,
     });
 
     await news.save();
