@@ -1,27 +1,35 @@
 const express = require("express");
-const Location = require("../models/Location.js");
-const receiveLocation = async (req, res) => {
+const News = require("../models/News");
+const createNews = async (req, res) => {
   try {
-    // reading data from req body
-    const { latitude, longitude } = req.body;
+    const { content, location } = req.body;
 
-    // 1️⃣ Check presence (undefined / null)
-    if (latitude === undefined || longitude === undefined) {
+    // 1 Basic presence check
+    if (!content) {
       return res.status(400).json({
         success: false,
-        message: "Latitude and longitude are required",
+        message: "Content is required",
       });
     }
 
-    // 2️⃣ Check type
+    if (!location || location.latitude == null || location.longitude == null) {
+      return res.status(400).json({
+        success: false,
+        message: "Location with latitude and longitude is required",
+      });
+    }
+
+    const { latitude, longitude } = location;
+
+    // 2 Type check
     if (typeof latitude !== "number" || typeof longitude !== "number") {
       return res.status(400).json({
         success: false,
-        message: "Latitude and longitude must be numbers",
+        message: "Latitude and Longitude must be numbers",
       });
     }
 
-    // 3 Check valid ranges
+    // 3 Range Validation
     if (latitude < -90 || latitude > 90) {
       return res.status(400).json({
         success: false,
@@ -36,16 +44,21 @@ const receiveLocation = async (req, res) => {
       });
     }
 
-    const location = new Location({
-      latitude,
-      longitude,
+    // Save to MongoDB
+    const news = new News({
+      content,
+      location: {
+        latitude,
+        longitude,
+      },
     });
 
-    await location.save();
+    await news.save();
 
     return res.status(201).json({
       success: true,
-      message: "Location saved successfully",
+      message: "News created successfully",
+      data: news,
     });
   } catch (error) {
     return res.status(500).json({
@@ -56,5 +69,5 @@ const receiveLocation = async (req, res) => {
 };
 
 module.exports = {
-  receiveLocation,
+  createNews,
 };

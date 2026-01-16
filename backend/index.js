@@ -3,6 +3,7 @@ const connectDB = require("./config/db.js");
 
 //import routes
 const locationRoutes = require("./routes/location.route.js");
+const newsRoutes = require("./routes/news.route.js");
 const PORT = 5000;
 const dbURI =
   "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.8";
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // location.route all routers will be resolved on /location/
 app.use("/location", locationRoutes);
+app.use("/news", newsRoutes);
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
