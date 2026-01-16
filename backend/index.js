@@ -5,8 +5,7 @@ const connectDB = require("./config/db.js");
 const locationRoutes = require("./routes/location.route.js");
 const newsRoutes = require("./routes/news.route.js");
 const PORT = 5000;
-const dbURI =
-  "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.8";
+const dbURI = "mongodb://127.0.0.1:27017/nearyounews";
 //Connect to Database
 connectDB(dbURI);
 
