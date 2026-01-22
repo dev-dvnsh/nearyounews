@@ -71,7 +71,14 @@ const createNews = async (req, res) => {
 
 const getNearbyNews = async (req, res) => {
   try {
-    const { lat, lng, radius } = req.query;
+    const {
+      lat,
+      lng,
+      radius,
+      sort = "distance",
+      page = 1,
+      limit = 10,
+    } = req.query;
 
     //1 Basic Validation
     if (!lat || !lng || !radius) {
@@ -119,10 +126,26 @@ const getNearbyNews = async (req, res) => {
       });
     }
 
+    // to skip already shown news items
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // Sorting
+    let sortStage = {};
+    if (sort === "latest") {
+      sortStage = { createdAt: -1 };
+    } else {
+      // default = nearest first
+      sortStage = { distance: 1 };
+    }
+
     // 4 Geo query
     const news = await News.aggregate([
       {
+        // $geoNear gives the nearest to any lat and long, is a mongodb aggreagate pipeline, is also gives ditance between two locations
         $geoNear: {
+          // near will have users current location, db wil measure from here
           near: {
             type: "Point",
             coordinates: [longitude, latitude],
@@ -132,12 +155,32 @@ const getNearbyNews = async (req, res) => {
           spherical: true,
         },
       },
+      {
+        $addFields: {
+          distanceKm: { $divide: ["$distance", 1000] },
+        },
+      },
+      { $sort: sortStage },
+      {
+        $facet: {
+          data: [{ $skip: skip }, { $limit: limitNumber }],
+          totalCount: [{ $count: "count" }],
+        },
+      },
     ]);
+
+    const data = result[0].data;
+    const totalResults = results[0].totalCount[0]?.count || 0;
+    const totalPages = Math.ceil(totalResults / limitNumber);
 
     return res.status(200).json({
       success: true,
-      count: news.length,
-      data: news,
+      page: pageNumber,
+      limit: limitNumber,
+      totalResults,
+      totalPages,
+      count: data.length,
+      data,
     });
   } catch (error) {
     console.error(error);
