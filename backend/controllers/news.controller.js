@@ -120,17 +120,19 @@ const getNearbyNews = async (req, res) => {
     }
 
     // 4 Geo query
-    const news = await News.find({
-      location: {
-        $near: {
-          $geometry: {
+    const news = await News.aggregate([
+      {
+        $geoNear: {
+          near: {
             type: "Point",
             coordinates: [longitude, latitude],
           },
-          $maxDistance: maxDistance, //meters
+          distanceField: "distance",
+          maxDistance: maxDistance,
+          spherical: true,
         },
       },
-    });
+    ]);
 
     return res.status(200).json({
       success: true,
