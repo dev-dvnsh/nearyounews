@@ -4,6 +4,6 @@ const router = express.Router();
 
 const { receiveLocation } = require("../controllers/location.controller");
 
-router.post("/", receiveLocation);
+router.post("/update", receiveLocation);
 
 module.exports = router;

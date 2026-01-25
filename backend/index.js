@@ -1,11 +1,11 @@
 const express = require("express");
 const connectDB = require("./config/db.js");
-
+require("dotenv").config();
 //import routes
 const locationRoutes = require("./routes/location.route.js");
 const newsRoutes = require("./routes/news.route.js");
-const PORT = 5000;
-const dbURI = "mongodb://127.0.0.1:27017/nearyounews";
+const PORT = process.env.PORT || 5000;
+const dbURI = process.env.MONGO_URI;
 //Connect to Database
 connectDB(dbURI);
 
@@ -15,11 +15,9 @@ const app = express();
 app.use(express.json());
 
 // location.route all routers will be resolved on /location/
-app.use("/location", locationRoutes);
-app.use("/news", newsRoutes);
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
+app.use("/api/v1/location", locationRoutes);
+app.use("/api/v1/news", newsRoutes);
+
 app.get("/health", (req, res) => {
   res.send("Health checked");
 });

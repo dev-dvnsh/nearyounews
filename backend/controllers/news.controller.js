@@ -173,8 +173,9 @@ const getNearbyNews = async (req, res) => {
           totalCount: [{ $count: "count" }],
         },
       },
-    ]).explain("executionStats");
+    ]);
     console.log(news);
+
     // If no nearby news found
     if (!news.length) {
       return res.status(200).json({

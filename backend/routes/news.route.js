@@ -9,6 +9,6 @@ const {
 
 router.get("/nearby", getNearbyNews);
 
-router.post("/", createNews);
+router.post("/create", createNews);
 
 module.exports = router;
