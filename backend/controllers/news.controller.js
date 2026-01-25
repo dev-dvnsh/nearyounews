@@ -4,6 +4,7 @@ const createNews = async (req, res) => {
   try {
     const { content, latitude, longitude } = req.body;
 
+    console.log(content, latitude, longitude);
     // 1 Basic presence check
     if (!content) {
       return res.status(400).json({
@@ -80,6 +81,7 @@ const getNearbyNews = async (req, res) => {
       limit = 10,
     } = req.query;
 
+    console.log(lat, lng);
     //1 Basic Validation
     if (!lat || !lng || !radius) {
       return res.status(400).json({
@@ -163,21 +165,38 @@ const getNearbyNews = async (req, res) => {
       { $sort: sortStage },
       {
         $facet: {
-          data: [{ $skip: skip }, { $limit: limitNumber }],
+          data: [
+            { $skip: skip },
+            { $limit: limitNumber },
+            { $project: { content: 1, distanceKm: 1, createdAt: 1, _id: 0 } },
+          ],
           totalCount: [{ $count: "count" }],
         },
       },
-    ]);
+    ]).explain("executionStats");
+    console.log(news);
+    // If no nearby news found
+    if (!news.length) {
+      return res.status(200).json({
+        success: true,
+        page: pageNumber,
+        limit: limitNumber,
+        totalNews: 0,
+        totalPages: 0,
+        count: 0,
+        data: [],
+      });
+    }
 
-    const data = result[0].data;
-    const totalResults = results[0].totalCount[0]?.count || 0;
-    const totalPages = Math.ceil(totalResults / limitNumber);
+    const data = news[0].data;
+    const totalNews = news[0].totalCount[0]?.count || 0;
+    const totalPages = Math.ceil(totalNews / limitNumber);
 
     return res.status(200).json({
       success: true,
       page: pageNumber,
       limit: limitNumber,
-      totalResults,
+      totalNews,
       totalPages,
       count: data.length,
       data,
