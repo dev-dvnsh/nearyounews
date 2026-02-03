@@ -4,7 +4,7 @@ const receiveLocation = async (req, res) => {
   try {
     // reading data from req body
     const { latitude, longitude } = req.body;
-    console.log(latitude, longitude);
+    // console.log(latitude, longitude);
     // 1️⃣ Check presence (undefined / null)
     if (latitude === undefined || longitude === undefined) {
       return res.status(400).json({
