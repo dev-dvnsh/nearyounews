@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "nearby-news",
-    "slug": "nearby-news",
+    "name": "nearyounews",
+    "slug": "nearyounews",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

@@ -1,58 +1,79 @@
-import { View, Text, StyleSheet } from "react-native";
-import { useEffect, useState } from "react";
-import * as Location from "expo-location";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import HomeScreen from "./screens/HomeScreen";
+import LocationScreen from "./screens/LocationScreen";
+import AddNewsScreen from "./screens/AddNewsScreen";
 
-export default function App() {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+const Tab = createBottomTabNavigator();
 
-  useEffect(() => {
-    (async () => {
-      // 1. Ask permission
-      let { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      // 2. Get location
-      let currentLocation = await Location.getCurrentPositionAsync({});
-
-      // 3. Save only what we need
-      setLocation({
-        latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude,
-      });
-    })();
-  }, []);
+function AppNavigator() {
+  const { theme, isDarkMode } = useTheme();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}> Live Location</Text>
-
-      {errorMsg && <Text>{errorMsg}</Text>}
-
-      {location ? (
-        <>
-          <Text>Latitude: {location.latitude}</Text>
-          <Text>Longitude: {location.longitude}</Text>
-        </>
-      ) : (
-        <Text>Fetching location...</Text>
-      )}
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: "#2196F3",
+          tabBarInactiveTintColor: isDarkMode ? "#888" : "#999",
+          tabBarStyle: {
+            backgroundColor: theme.tabBar,
+            borderTopColor: theme.tabBarBorder,
+          },
+        }}
+      >
+        <Tab.Screen 
+          name="Home" 
+          component={HomeScreen}
+          options={{
+            tabBarLabel: "Home",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen 
+          name="AddNews" 
+          component={AddNewsScreen}
+          options={{
+            tabBarLabel: "",
+            tabBarIcon: ({ color }) => (
+              <View style={{
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                backgroundColor: "#2196F3",
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 20,
+              }}>
+                <Text style={{ fontSize: 30, color: "#fff", fontWeight: "bold" }}>+</Text>
+              </View>
+            ),
+          }}
+        />
+        <Tab.Screen 
+          name="Location" 
+          component={LocationScreen}
+          options={{
+            tabBarLabel: "Location",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="location" size={size} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 22,
-    marginBottom: 10,
-  },
-});
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppNavigator />
+    </ThemeProvider>
+  );
+}
