@@ -185,40 +185,29 @@ export default function NewsFeed({ location }) {
             </View>
 
             <View style={styles.filterSection}>
-              <Text style={styles.filterLabel}>Sort by:</Text>
+              <Text style={[styles.filterLabel, { color: theme.text }]}>Sort by:</Text>
               <View style={styles.filterButtons}>
-                <TouchableOpacity
-                  key="distance"
-                  style={[styles.filterButton, tempSort === "distance" && styles.filterButtonActive]}
-                  onPress={() => setTempSort("distance")}
-                >
-                  <View style={styles.filterButtonContent}>
-                    <Ionicons 
-                      name="location" 
-                      size={16} 
-                      color={tempSort === "distance" ? "#fff" : "#666"}
-                    />
-                    <Text style={[styles.filterButtonText, tempSort === "distance" && styles.filterButtonTextActive]}>
-                      Distance
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  key="time"
-                  style={[styles.filterButton, tempSort === "time" && styles.filterButtonActive]}
-                  onPress={() => setTempSort("time")}
-                >
-                  <View style={styles.filterButtonContent}>
-                    <Ionicons 
-                      name="time" 
-                      size={16} 
-                      color={tempSort === "time" ? "#fff" : "#666"}
-                    />
-                    <Text style={[styles.filterButtonText, tempSort === "time" && styles.filterButtonTextActive]}>
-                      Recent
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                {[
+                  { key: "distance", icon: "location", label: "Distance" },
+                  { key: "time", icon: "time", label: "Recent" }
+                ].map((sortOption) => (
+                  <TouchableOpacity
+                    key={sortOption.key}
+                    style={[styles.filterButton, tempSort === sortOption.key && styles.filterButtonActive]}
+                    onPress={() => setTempSort(sortOption.key)}
+                  >
+                    <View style={styles.filterButtonContent}>
+                      <Ionicons 
+                        name={sortOption.icon} 
+                        size={16} 
+                        color={tempSort === sortOption.key ? "#fff" : "#666"}
+                      />
+                      <Text style={[styles.filterButtonText, tempSort === sortOption.key && styles.filterButtonTextActive]}>
+                        {sortOption.label}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
 
@@ -246,7 +235,7 @@ export default function NewsFeed({ location }) {
         <FlatList
           data={news}
           renderItem={renderNewsItem}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => item._id || `news-${index}`}
           contentContainerStyle={styles.listContent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#2196F3"]} />}
         />
