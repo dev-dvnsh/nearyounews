@@ -18,7 +18,7 @@ const newsSchema = new mongoose.Schema(
         required: true,
       },
     },
-    newsImage: [
+    newsImageUrl: [
       {
         type: String,
       },

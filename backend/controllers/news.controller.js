@@ -2,8 +2,11 @@ const express = require("express");
 const News = require("../models/News");
 const createNews = async (req, res) => {
   try {
-    const { content, latitude, longitude } = req.body;
+    // const { content, latitude, longitude } = req.body;
 
+    const { content } = req.body;
+    const latitude = Number(req.body.latitude);
+    const longitude = Number(req.body.longitude);
     console.log(content, latitude, longitude);
     // 1 Basic presence check
     if (!content) {
@@ -21,7 +24,8 @@ const createNews = async (req, res) => {
     }
 
     // 2 Type check
-    if (typeof latitude !== "number" || typeof longitude !== "number") {
+
+    if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
       return res.status(400).json({
         success: false,
         message: "Latitude and Longitude must be numbers",
@@ -43,6 +47,16 @@ const createNews = async (req, res) => {
       });
     }
 
+    // Image required
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Image upload is required",
+      });
+    }
+
+    const imageUrl = `/uploads/news/${req.file.filename}`;
+
     // Transform into GeoJSON
     const location = {
       type: "Point",
@@ -53,6 +67,7 @@ const createNews = async (req, res) => {
     const news = new News({
       content,
       location,
+      newsImageUrl: [imageUrl],
     });
 
     await news.save();
@@ -83,7 +98,8 @@ const getNearbyNews = async (req, res) => {
 
     console.log(lat, lng);
     //1 Basic Validation
-    if (!lat || !lng || !radius) {
+
+    if (lat === undefined || lng === undefined || radius === undefined) {
       return res.status(400).json({
         success: false,
         message: "latitude, longitude and radius are required",
@@ -168,7 +184,15 @@ const getNearbyNews = async (req, res) => {
           data: [
             { $skip: skip },
             { $limit: limitNumber },
-            { $project: { content: 1, distanceKm: 1, createdAt: 1, _id: 0 } },
+            {
+              $project: {
+                content: 1,
+                distanceKm: 1,
+                createdAt: 1,
+                newsImageUrl: 1,
+                _id: 0,
+              },
+            },
           ],
           totalCount: [{ $count: "count" }],
         },
@@ -193,6 +217,12 @@ const getNearbyNews = async (req, res) => {
     const totalNews = news[0].totalCount[0]?.count || 0;
     const totalPages = Math.ceil(totalNews / limitNumber);
 
+    const formattedData = data.map((item) => ({
+      ...item,
+      newsImageUrl: item.newsImageUrl?.map(
+        (img) => `${req.protocol}://${req.get("host")}${img}`,
+      ),
+    }));
     return res.status(200).json({
       success: true,
       page: pageNumber,
@@ -200,7 +230,7 @@ const getNearbyNews = async (req, res) => {
       totalNews,
       totalPages,
       count: data.length,
-      data,
+      data: formattedData,
     });
   } catch (error) {
     console.error(error);

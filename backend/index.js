@@ -14,6 +14,8 @@ const app = express();
 //body parser middleware
 app.use(express.json());
 
+// make uploads public
+app.use("/uploads", express.static("uploads"));
 // location.route all routers will be resolved on /location/
 app.use("/api/v1/location", locationRoutes);
 app.use("/api/v1/news", newsRoutes);

@@ -6,9 +6,9 @@ const {
   createNews,
   getNearbyNews,
 } = require("../controllers/news.controller.js");
-
+const uploadNewsImage = require("../middlewares/uploadNewsImage.middleware.js");
 router.get("/nearby", getNearbyNews);
 
-router.post("/create", createNews);
+router.post("/create", uploadNewsImage.single("image"), createNews);
 
 module.exports = router;
