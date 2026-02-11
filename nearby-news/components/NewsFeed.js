@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Modal, Image } from "react-native";
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchNearbyNews } from "../services/news";
@@ -12,6 +12,7 @@ export default function NewsFeed({ location }) {
   const [radius, setRadius] = useState(5000);
   const [sort, setSort] = useState("distance");
   const [showFilters, setShowFilters] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
   
   // Temporary filter values for modal
   const [tempRadius, setTempRadius] = useState(5000);
@@ -81,6 +82,15 @@ export default function NewsFeed({ location }) {
 
   const renderNewsItem = ({ item }) => (
     <View style={[styles.newsCard, { backgroundColor: theme.card }]}>
+      {Array.isArray(item.newsImageUrl) && item.newsImageUrl.length > 0 && (
+        <TouchableOpacity onPress={() => setFullscreenImage(item.newsImageUrl[0])} activeOpacity={0.9}>
+          <Image
+            source={{ uri: item.newsImageUrl[0] }}
+            style={styles.newsImage}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      )}
       <Text style={[styles.newsContent, { color: theme.text }]}>{item.content}</Text>
       <View style={[styles.newsFooter, { borderTopColor: theme.border }]}>
         <View style={styles.metaItem}>
@@ -240,6 +250,28 @@ export default function NewsFeed({ location }) {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#2196F3"]} />}
         />
       )}
+
+      {/* Fullscreen Image Modal */}
+      <Modal
+        visible={fullscreenImage !== null}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setFullscreenImage(null)}
+      >
+        <View style={styles.fullscreenModal}>
+          <TouchableOpacity 
+            style={styles.fullscreenClose} 
+            onPress={() => setFullscreenImage(null)}
+          >
+            <Ionicons name="close" size={32} color="#fff" />
+          </TouchableOpacity>
+          <Image 
+            source={{ uri: fullscreenImage }} 
+            style={styles.fullscreenImage} 
+            resizeMode="contain"
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -279,6 +311,7 @@ const styles = StyleSheet.create({
   applyButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   listContent: { padding: 16 },
   newsCard: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 12, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  newsImage: { width: "100%", height: 300, borderRadius: 10, marginBottom: 12, backgroundColor: "#ddd" },
   newsContent: { fontSize: 16, color: "#333", lineHeight: 24, marginBottom: 12 },
   newsFooter: { flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: "#f0f0f0", paddingTop: 8 },
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
@@ -293,4 +326,21 @@ const styles = StyleSheet.create({
   retryButton: { backgroundColor: "#2196F3", paddingVertical: 12, paddingHorizontal: 32, borderRadius: 8 },
   retryButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   infoText: { fontSize: 14, color: "#666" },
+  fullscreenModal: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fullscreenClose: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    padding: 10,
+  },
+  fullscreenImage: {
+    width: "100%",
+    height: "100%",
+  },
 });

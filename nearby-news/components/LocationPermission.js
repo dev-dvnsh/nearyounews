@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getCurrentLocation, requestSystemPermission } from "../services/location";
+import { useTheme } from "../context/ThemeContext";
 
 const PERMISSION_KEY = "@location_permission_preference";
 
@@ -10,6 +11,7 @@ export default function LocationPermission({ children }) {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { theme } = useTheme();
 
   useEffect(() => {
     checkPermissionAndFetchLocation();
@@ -87,9 +89,9 @@ export default function LocationPermission({ children }) {
           animationType="fade"
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Location Permission</Text>
-              <Text style={styles.modalDescription}>
+            <View style={[styles.modalContent, { backgroundColor: theme.modalBg }]}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Location Permission</Text>
+              <Text style={[styles.modalDescription, { color: theme.subtext }]}>
                 This app needs access to your location to show nearby news.
               </Text>
 
@@ -108,10 +110,10 @@ export default function LocationPermission({ children }) {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.button, styles.buttonDeny]}
+                style={[styles.button, styles.buttonDeny, { backgroundColor: theme.card, borderColor: theme.border }]}
                 onPress={handleDeny}
               >
-                <Text style={styles.buttonTextDeny}>Deny</Text>
+                <Text style={[styles.buttonTextDeny, { color: theme.subtext }]}>Deny</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -204,7 +206,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContent: {
-    backgroundColor: "white",
     borderRadius: 20,
     padding: 30,
     width: "85%",
@@ -227,7 +228,6 @@ const styles = StyleSheet.create({
   modalDescription: {
     fontSize: 16,
     textAlign: "center",
-    color: "#666",
     marginBottom: 25,
     lineHeight: 22,
   },
@@ -245,9 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2196F3",
   },
   buttonDeny: {
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#ccc",
   },
   buttonText: {
     color: "white",
@@ -255,7 +253,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   buttonTextDeny: {
-    color: "#666",
     fontSize: 16,
     fontWeight: "600",
   },

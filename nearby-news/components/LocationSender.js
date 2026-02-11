@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "rea
 import { useState, useEffect } from "react";
 import { sendLocationToBackend } from "../services/api";
 import { getCurrentLocation } from "../services/location";
+import { useTheme } from "../context/ThemeContext";
 
 const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes in milliseconds
 
@@ -11,6 +12,7 @@ export default function LocationSender({ location: initialLocation }) {
   const [lastSent, setLastSent] = useState(null);
   const [error, setError] = useState(null);
   const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
+  const { theme } = useTheme();
 
   // Auto-send initial location
   useEffect(() => {
@@ -82,21 +84,21 @@ export default function LocationSender({ location: initialLocation }) {
   if (!location) {
     return (
       <View style={styles.container}>
-        <Text style={styles.infoText}>Waiting for location...</Text>
+        <Text style={[styles.infoText, { color: theme.subtext }]}>Waiting for location...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.locationBox}>
-        <Text style={styles.label}>Current Location:</Text>
-        <Text style={styles.coords}>Lat: {location.latitude.toFixed(6)}</Text>
-        <Text style={styles.coords}>Lng: {location.longitude.toFixed(6)}</Text>
+      <View style={[styles.locationBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <Text style={[styles.label, { color: theme.text }]}>Current Location:</Text>
+        <Text style={[styles.coords, { color: theme.subtext }]}>Lat: {location.latitude.toFixed(6)}</Text>
+        <Text style={[styles.coords, { color: theme.subtext }]}>Lng: {location.longitude.toFixed(6)}</Text>
         
-        <View style={styles.statusRow}>
+        <View style={[styles.statusRow, { borderTopColor: theme.border }]}>
           <View style={[styles.statusDot, autoUpdateEnabled && styles.statusDotActive]} />
-          <Text style={styles.statusText}>
+          <Text style={[styles.statusText, { color: theme.subtext }]}>
             Auto-update: {autoUpdateEnabled ? "Active (every 2 min)" : "Paused"}
           </Text>
         </View>
@@ -115,7 +117,7 @@ export default function LocationSender({ location: initialLocation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.buttonSecondary]}
+        style={[styles.buttonSecondary, { backgroundColor: theme.card, borderColor: "#2196F3" }]}
         onPress={() => setAutoUpdateEnabled(!autoUpdateEnabled)}
       >
         <Text style={styles.buttonSecondaryText}>
@@ -124,10 +126,10 @@ export default function LocationSender({ location: initialLocation }) {
       </TouchableOpacity>
 
       {lastSent && (
-        <Text style={styles.successText}>✓ Last sent at {lastSent}</Text>
+        <Text style={[styles.successText, { color: theme.text }]}>✓ Last sent at {lastSent}</Text>
       )}
 
-      {error && <Text style={styles.errorText}>✗ {error}</Text>}
+      {error && <Text style={[styles.errorText, { color: theme.text }]}>✗ {error}</Text>}
     </View>
   );
 }
@@ -139,9 +141,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   locationBox: {
-    backgroundColor: "#f5f5f5",
     padding: 15,
     borderRadius: 10,
+    borderWidth: 1,
     width: "100%",
     marginBottom: 20,
   },
@@ -149,11 +151,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 10,
-    color: "#333",
   },
   coords: {
     fontSize: 14,
-    color: "#666",
     marginVertical: 2,
   },
   button: {
@@ -173,17 +173,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   successText: {
-    color: "#4CAF50",
     marginTop: 15,
     fontSize: 14,
   },
   errorText: {
-    color: "#f44336",
     marginTop: 15,
     fontSize: 14,
   },
   infoText: {
-    color: "#666",
     fontSize: 14,
   },
   statusRow: {
@@ -192,7 +189,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
   },
   statusDot: {
     width: 10,
@@ -206,12 +202,9 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    color: "#666",
   },
   buttonSecondary: {
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#2196F3",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 10,

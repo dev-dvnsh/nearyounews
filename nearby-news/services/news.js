@@ -53,22 +53,35 @@ export const fetchNearbyNews = async ({
  * @param {string} content - News content
  * @param {number} latitude - News location latitude
  * @param {number} longitude - News location longitude
+ * @param {string} imageUri - Local image URI
  * @returns {Promise<Object>} - API response
  */
-export const createNews = async ({ content, latitude, longitude }) => {
+export const createNews = async ({ content, latitude, longitude, imageUri }) => {
   try {
-    console.log("Creating news:", { content, latitude, longitude });
+    console.log("Creating news:", { content, latitude, longitude, imageUri });
+
+    const formData = new FormData();
+    formData.append("content", content);
+    formData.append("latitude", String(latitude));
+    formData.append("longitude", String(longitude));
+    
+    // Add image file
+    const filename = imageUri.split("/").pop();
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : "image/jpeg";
+    
+    formData.append("image", {
+      uri: imageUri,
+      name: filename,
+      type,
+    });
 
     const response = await fetch(`${config.API_BASE_URL}/news/create`, {
       method: "POST",
+      body: formData,
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
       },
-      body: JSON.stringify({
-        content,
-        latitude,
-        longitude,
-      }),
     });
 
     console.log("Create news response status:", response.status);
