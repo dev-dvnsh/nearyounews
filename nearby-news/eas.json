@@ -1,0 +1,15 @@
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://nearyounews.onrender.com/api/v1",
+        "EXPO_PUBLIC_APP_NAME": "NearYouNews",
+        "EXPO_PUBLIC_DEFAULT_RADIUS": "5000",
+        "EXPO_PUBLIC_UPDATE_INTERVAL": "120000"
+      }
+    }
+  }
+}
