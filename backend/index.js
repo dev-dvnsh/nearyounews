@@ -23,6 +23,6 @@ app.use("/api/v1/news", newsRoutes);
 app.get("/health", (req, res) => {
   res.send("Health checked");
 });
-app.listen(PORT, () => {
-  console.log(`Server is running on localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on 0.0.0.0:${PORT}`);
 });
