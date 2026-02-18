@@ -11,7 +11,6 @@ const dbURI = process.env.MONGO_URI;
 const app = express();
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
 app.use("/api/v1/location", locationRoutes);
 app.use("/api/v1/news", newsRoutes);
 

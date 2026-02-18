@@ -1,5 +1,21 @@
 const express = require("express");
 const News = require("../models/News");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
+
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "nearyounews" },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      },
+    );
+
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 const createNews = async (req, res) => {
   try {
     // const { content, latitude, longitude } = req.body;
@@ -48,6 +64,8 @@ const createNews = async (req, res) => {
     }
 
     // Image required
+
+    // Image required
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -55,8 +73,9 @@ const createNews = async (req, res) => {
       });
     }
 
-    const imageUrl = `/uploads/news/${req.file.filename}`;
-
+    //  Upload to Cloudinary
+    const result = await uploadToCloudinary(req.file.buffer);
+    const imageUrl = result.secure_url;
     // Transform into GeoJSON
     const location = {
       type: "Point",
@@ -219,9 +238,8 @@ const getNearbyNews = async (req, res) => {
 
     const formattedData = data.map((item) => ({
       ...item,
-      newsImageUrl: item.newsImageUrl?.map(
-        (img) => `${req.protocol}://${req.get("host")}${img}`,
-      ),
+
+      newsImageUrl: item.newsImageUrl,
     }));
     return res.status(200).json({
       success: true,
