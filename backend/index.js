@@ -12,11 +12,11 @@ const app = express();
 
 // Add CORS middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
   next();
@@ -26,14 +26,14 @@ app.use(express.json());
 
 // Add root route
 app.get("/", (req, res) => {
-  res.json({ 
-    message: "NearYouNews API", 
+  res.json({
+    message: "NearYouNews API",
     version: "1.0.0",
     endpoints: {
       health: "/health",
       location: "/api/v1/location",
-      news: "/api/v1/news"
-    }
+      news: "/api/v1/news",
+    },
   });
 });
 

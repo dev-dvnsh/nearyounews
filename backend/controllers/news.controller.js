@@ -168,9 +168,9 @@ const getNearbyNews = async (req, res) => {
     const limitNumber = Number(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
-    // Sorting
+    // Sorting: frontend sends "time" while API also supports "latest".
     let sortStage = {};
-    if (sort === "latest") {
+    if (sort === "latest" || sort === "time") {
       sortStage = { createdAt: -1 };
     } else {
       // default = nearest first
@@ -251,7 +251,7 @@ const getNearbyNews = async (req, res) => {
       data: formattedData,
     });
   } catch (error) {
-    console.error(error);
+    console.error("getNearbyNews error:", error);
     return res.status(500).json({
       success: false,
       message: "server error",
